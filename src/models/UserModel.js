@@ -53,6 +53,20 @@ async function createUser(user) {
     }
 }
 
+async function loginUser(user) {
+    if (!user.email || !user.password) {
+        return { error: ["Email and Password must not be blank"] };
+    }
+
+    let existingUser = await findUser(user.email);
+
+    if (existingUser && bcrypt.compareSync(user.password, existingUser.password)) {
+        return { success: "User Found!" };
+    }
+
+    return { error: ["Invalid Credentials"] };
+}
+
 function validateSignup(userInput) {
     let { first_name, last_name, email, password, confirm_password } = userInput;
 
@@ -104,4 +118,4 @@ function findUser(email) {
 }
 
 // console.log(bcrypt.compareSync(password, passwordHash));
-module.exports = { getAllUsers, createUser };
+module.exports = { getAllUsers, createUser, loginUser };

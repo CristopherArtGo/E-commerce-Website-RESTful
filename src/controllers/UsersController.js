@@ -5,13 +5,7 @@ function index(req, res) {
 }
 
 function signup(req, res) {
-    let errors;
-    let message;
-    if (req.session.flash) {
-        req.session.flash.signupErrors ? (errors = req.session.flash.signupErrors) : false;
-        req.session.flash.successMessage ? (message = req.session.flash.successMessage) : false;
-    }
-    res.render("signup", { errors: errors, message: message });
+    res.render("signup");
 }
 
 async function createUser(req, res) {
@@ -19,8 +13,9 @@ async function createUser(req, res) {
     res.json(result);
 }
 
-// async function loginUser(req, res) {
-//     let result = await model.loginUser(req.body);
-// }
+async function loginUser(req, res) {
+    let result = await model.loginUser(req.body);
+    res.json(result);
+}
 
-module.exports = { index, signup, createUser };
+module.exports = { index, signup, createUser, loginUser };
