@@ -3,9 +3,10 @@ document.querySelector("form").addEventListener("submit", (event) => {
     document.querySelector("div.message").innerHTML = "";
     let formData = new FormData(event.target);
     const formEntries = Object.fromEntries(formData.entries());
+    console.log(formEntries);
 
     (async () => {
-        const rawResponse = await fetch("/users", {
+        const rawResponse = await fetch("/login", {
             method: "POST",
             headers: {
                 Accept: "application/json",
