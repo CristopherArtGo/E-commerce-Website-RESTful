@@ -11,7 +11,8 @@ let db = new sqlite3.Database("database.db", (err) => {
 
 function getAllUsers() {
     return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM users", [], (err, rows) => {
+        let sql = "SELECT * FROM users";
+        db.all(sql, [], (err, rows) => {
             if (err) {
                 reject(err);
             }
@@ -61,7 +62,7 @@ async function loginUser(user) {
     let existingUser = await findUser(user.email);
 
     if (existingUser && bcrypt.compareSync(user.password, existingUser.password)) {
-        return { success: "User Found!" };
+        return existingUser;
     }
 
     return { error: ["Invalid Credentials"] };
@@ -104,7 +105,8 @@ function validateSignup(userInput) {
 
 function findUser(email) {
     return new Promise((resolve, reject) => {
-        db.all(`SELECT * FROM users WHERE email = ?`, [email], (err, row) => {
+        let sql = "SELECT * FROM users WHERE email = ?";
+        db.all(sql, [email], (err, row) => {
             if (err) {
                 reject(err.message);
             }
@@ -117,5 +119,63 @@ function findUser(email) {
     });
 }
 
-// console.log(bcrypt.compareSync(password, passwordHash));
-module.exports = { getAllUsers, createUser, loginUser };
+async function saveToken(user, token) {
+    return new Promise((resolve, reject) => {
+        let tokenHash = bcrypt.hashSync(token, 10);
+
+        let userExists = async () => {
+            return new Promise((resolve, reject) => {
+                let sql = "SELECT * FROM tokens WHERE email = ?";
+                db.get(sql, [user], (err, row) => {
+                    if (err) {
+                        reject(err);
+                    }
+
+                    if (row) {
+                        resolve(true);
+                    }
+
+                    resolve(false);
+                });
+            });
+        };
+
+        let sql = "INSERT INTO tokens(email, token) VALUES(?, ?)";
+
+        if (userExists) {
+            sql = "UPDATE tokens SET token = ? WHERE email = ?";
+            db.run(sql, [tokenHash, user], (err) => {
+                if (err) {
+                    reject(err);
+                }
+                resolve("Token Created");
+            });
+        }
+
+        db.run(sql, [user, tokenHash], (err) => {
+            if (err) {
+                reject(err);
+            }
+            resolve("Token Created");
+        });
+    });
+}
+
+async function verifyToken(email, token) {
+    return new Promise((resolve, reject) => {
+        let sql = "SELECT * FROM tokens WHERE email = ?";
+        db.get(sql, [email], (err, row) => {
+            if (err) {
+                reject(err);
+            }
+
+            if (row && bcrypt.compareSync(token, row.token)) {
+                resolve(true);
+            }
+
+            resolve(false);
+        });
+    });
+}
+
+module.exports = { getAllUsers, createUser, loginUser, saveToken, verifyToken };
