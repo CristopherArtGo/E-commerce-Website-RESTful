@@ -16,15 +16,7 @@ function signup(req, res) {
 
 async function createUser(req, res) {
     let result = await model.createUser(req.body);
-
-    if (result) {
-        //render errors
-        req.flash("signupErrors", result);
-    } else {
-        req.flash("successMessage", "User Created Successfuly");
-    }
-    // console.log(req.session.flash);
-    res.redirect("/signup");
+    res.json(result);
 }
 
 // async function loginUser(req, res) {

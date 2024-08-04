@@ -6,40 +6,30 @@
         <title>Signup Page</title>
         <link rel="stylesheet" href="css/bootstrap/bootstrap.css" />
         <script defer src="js/bootstrap.js"></script>
+        <script defer src="js/form.js"></script>
     </head>
     <body class="min-h-100 py-3">
         <div class="container">
             <h1>AMAZUN</h1>
-            <%_ if(errors) { _%>
-                <div class="alert alert-danger" role="alert">
-                <%_ errors.forEach(error => { _%>
-                    <p class="text-danger"><%= error %></p>
-                <%_ }) _%>
-                </div>
-            <%_ } _%>
-            <%_ if(message) { _%>
-                <div class="alert alert-success" role="alert">
-                    <p class="text-success"><%= message %></p>
-                </div>
-            <%_ } _%>
-            <form action="/users" method="post" class="col-md-4">
+            <div class="message"></div>
+            <form action="" method="" class="col-md-4">
                 <label for="first_name" class="form-label">First Name</label>
-                <input type="text" id="first_name" class="form-control mb-3" name="first_name"/>
+                <input type="text" id="first_name" class="form-control mb-3" name="first_name" />
 
                 <label for="last_name" class="form-label">Last Name</label>
                 <input type="text" id="last_name" class="form-control mb-3" name="last_name" />
 
                 <label for="email" class="form-label">Email</label>
-                <input type="email" id="email" class="form-control mb-3" name="email"/>
+                <input type="email" id="email" class="form-control mb-3" name="email" />
 
                 <label for="password" class="form-label">Password</label>
-                <input type="password" id="password" class="form-control mb-3" name="password"/>
+                <input type="password" id="password" class="form-control mb-3" name="password" />
 
                 <label for="confirm_password" class="form-label">Confirm Password</label>
-                <input type="password" id="confirm_password" class="form-control mb-3" name="confirm_password"/>
+                <input type="password" id="confirm_password" class="form-control mb-3" name="confirm_password" />
 
                 <button class="btn btn-primary mb-3" type="submit">Create Account</button>
-                <p>Alreadt have an account? <a href="/">Log in here</a></p>
+                <p>Alreadt have an account? <a href="/login">Log in here</a></p>
             </form>
         </div>
     </body>

@@ -10,12 +10,12 @@ let db = new sqlite3.Database("database.db", (err) => {
 });
 
 function getAllUsers() {
-    db.all("SELECT * FROM users", [], (err, rows) => {
-        if (err) {
-            throw err;
-        }
-        rows.forEach((row) => {
-            console.log(row);
+    return new Promise((resolve, reject) => {
+        db.all("SELECT * FROM users", [], (err, rows) => {
+            if (err) {
+                reject(err);
+            }
+            resolve(rows);
         });
     });
 }
@@ -25,7 +25,7 @@ async function createUser(user) {
         let inputErrors = validateSignup(user);
 
         if (inputErrors) {
-            throw inputErrors;
+            throw { error: inputErrors };
         }
 
         let { first_name, last_name, email, password } = user;
@@ -34,10 +34,19 @@ async function createUser(user) {
         let passwordHash = bcrypt.hashSync(password, 10);
         let sql = "INSERT INTO users(first_name, last_name, email, password, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?)";
 
-        db.run(sql, [first_name, last_name, email, passwordHash, currentTime, currentTime], (err) => {
-            if (err) {
-                throw err.message;
-            }
+        let existingUser = await findUser(email);
+
+        if (existingUser) {
+            throw { error: ["Email already taken!"] };
+        }
+
+        return new Promise((resolve, reject) => {
+            db.run(sql, [first_name, last_name, email, passwordHash, currentTime, currentTime], (err) => {
+                if (err) {
+                    reject(err.message);
+                }
+                resolve({ success: "User created successfully" });
+            });
         });
     } catch (error) {
         return error;
@@ -77,6 +86,21 @@ function validateSignup(userInput) {
     }
 
     return false;
+}
+
+function findUser(email) {
+    return new Promise((resolve, reject) => {
+        db.all(`SELECT * FROM users WHERE email = ?`, [email], (err, row) => {
+            if (err) {
+                reject(err.message);
+            }
+            if (row) {
+                resolve(row[0]);
+            }
+
+            resolve(undefined);
+        });
+    });
 }
 
 // console.log(bcrypt.compareSync(password, passwordHash));
