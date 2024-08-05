@@ -9,12 +9,13 @@
 
 # Features
 
-1. Users can signup and login and log out into the application (using JWT as authorization)
-2. Users can view all products
-3. Users can view more details of a product with a product page
-4. Users can view their user details in the profile page
-5. Admin users can view admin dashboard to add, edit and delete products
-6. Only admin users can access and perform admin related actions 
+1. Users can signup and login and log out into the application 
+2. Used JWT as authorization and hashed and salted users' password including refresh tokens in the database
+3. Users can view all products
+4. Users can view more details of a product with a product page
+5. Users can view their user details in the profile page
+6. Admin users can view admin dashboard to add, update and delete products
+7. Only admin users can access and perform admin related actions 
 
 ## Installation
 
