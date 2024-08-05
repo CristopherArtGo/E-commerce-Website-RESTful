@@ -4,11 +4,11 @@ const cookie = require("cookie");
 require("dotenv").config();
 
 function index(req, res) {
-    res.redirect("/dashboard");
+    res.redirect("/products");
 }
 
 function login(req, res) {
-    res.render("index");
+    res.render("login");
 }
 
 function signup(req, res) {

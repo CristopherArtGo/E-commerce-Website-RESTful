@@ -4,9 +4,8 @@ const formatter = new Intl.NumberFormat("en-US", {
 });
 
 (async () => {
-    const rawResponse = await fetch("/products");
+    const rawResponse = await fetch("/api/products");
     const result = await rawResponse.json();
-    console.log(result);
     let container = document.querySelector("div.products");
     result.forEach((product) => {
         let { id, name, price } = product;
