@@ -2,7 +2,7 @@ const model = require("../models/ProductModel");
 
 function dashboard(req, res) {
     // res.send(req.user);
-    res.render("dashboard");
+    res.render("products");
 }
 
 async function getAllProducts(req, res) {
@@ -10,4 +10,13 @@ async function getAllProducts(req, res) {
     res.json(products);
 }
 
-module.exports = { dashboard, getAllProducts };
+function productPage(req, res) {
+    res.render("productPage");
+}
+
+async function productInfo(req, res) {
+    const product = await model.getProductInfo(parseInt(req.params.id));
+    res.json(product);
+}
+
+module.exports = { dashboard, getAllProducts, productInfo, productPage };

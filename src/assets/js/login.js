@@ -25,7 +25,7 @@ document.querySelector("form").addEventListener("submit", (event) => {
         }
 
         if (result.accessToken) {
-            window.location.replace("/dashboard");
+            window.location.replace("/products");
         }
     })();
 });

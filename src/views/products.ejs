@@ -3,15 +3,16 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Signup Page</title>
+        <title>Products</title>
         <link rel="stylesheet" href="css/bootstrap/bootstrap.css" />
         <script defer src="js/bootstrap/bootstrap.js"></script>
-        <script defer src="js/logout.js"></script>
+        <script defer src="js/products.js"></script>
     </head>
     <body class="min-h-100 py-3">
         <div class="container">
-            <h1 class="text-primary">AMAZUN</h1>
-            <div class="alert alert-danger" role="alert"><p class="text-danger">Logging out</p></div>
+            <%- include('partials/header') %>
+            <h4>All Products</h4>
+            <div class="products"></div>
         </div>
     </body>
 </html>
