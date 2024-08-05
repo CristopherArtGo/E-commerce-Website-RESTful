@@ -132,7 +132,7 @@ async function saveToken(user, token) {
                     }
 
                     if (row) {
-                        resolve(true);
+                        resolve("exists");
                     }
 
                     resolve(false);
@@ -140,10 +140,8 @@ async function saveToken(user, token) {
             });
         };
 
-        let sql = "INSERT INTO tokens(email, token) VALUES(?, ?)";
-
         if (userExists) {
-            sql = "UPDATE tokens SET token = ? WHERE email = ?";
+            let sql = "UPDATE tokens SET token = ? WHERE email = ?";
             db.run(sql, [tokenHash, user], (err) => {
                 if (err) {
                     reject(err);
@@ -151,7 +149,7 @@ async function saveToken(user, token) {
                 resolve("Token Created");
             });
         }
-
+        let sql = "INSERT INTO tokens(email, token) VALUES(?, ?)";
         db.run(sql, [user, tokenHash], (err) => {
             if (err) {
                 reject(err);
@@ -170,7 +168,7 @@ async function verifyToken(email, token) {
             }
 
             if (row && bcrypt.compareSync(token, row.token)) {
-                resolve(true);
+                resolve("match");
             }
 
             resolve(false);
@@ -178,4 +176,16 @@ async function verifyToken(email, token) {
     });
 }
 
-module.exports = { getAllUsers, createUser, loginUser, saveToken, verifyToken };
+async function logout(email) {
+    return new Promise((resolve, reject) => {
+        let sql = "DELETE FROM tokens WHERE email = ?";
+        db.run(sql, [email], (err, row) => {
+            if (err) {
+                reject(err);
+            }
+            resolve();
+        });
+    });
+}
+
+module.exports = { getAllUsers, createUser, loginUser, saveToken, verifyToken, logout };

@@ -4,6 +4,10 @@ const cookie = require("cookie");
 require("dotenv").config();
 
 function index(req, res) {
+    res.redirect("/dashboard");
+}
+
+function login(req, res) {
     res.render("index");
 }
 
@@ -23,13 +27,13 @@ async function loginUser(req, res) {
         res.json(result);
     } else {
         const user = { email: result.email };
-        const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "10s" });
+        const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
         const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "1d" });
 
         let saveToken = await model.saveToken(user.email, refreshToken);
         if (saveToken == "Token Created") {
-            res.cookie("MY_ACCESS_TOKEN", accessToken, { httpOnly: true, maxAge: 10 * 1000, secure: true, sameSite: "strict" });
-            res.cookie("MY_REFRESH_TOKEN", refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: true, sameSite: "strict", path: "/refresh" });
+            res.cookie("MY_ACCESS_TOKEN", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000, secure: true, sameSite: "strict" });
+            res.cookie("MY_REFRESH_TOKEN", refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: true, sameSite: "strict", path: ["/logout", "/refresh"] });
             res.json({ accessToken: accessToken });
         } else {
             res.sendStatus(500);
@@ -42,12 +46,12 @@ function dashboard(req, res) {
 }
 
 function authenticateToken(req, res, next) {
-    const token = cookie.parse(req.headers.cookie).MY_ACCESS_TOKEN;
-    if (!token) {
+    const accessToken = cookie.parse(req.headers.cookie).MY_ACCESS_TOKEN;
+    if (!accessToken) {
         return res.redirect("/refresh");
     }
 
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+    jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
         if (err) {
             return res.sendStatus(403);
         }
@@ -59,6 +63,7 @@ function authenticateToken(req, res, next) {
 
 async function refreshToken(req, res) {
     const refreshToken = cookie.parse(req.headers.cookie).MY_REFRESH_TOKEN;
+    console.log(refreshToken);
 
     if (!refreshToken) {
         res.redirect("/login");
@@ -77,14 +82,46 @@ async function refreshToken(req, res) {
 
     const verifyToken = await model.verifyToken(email, refreshToken);
 
-    if (verifyToken) {
-        const accessToken = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "10s" });
-        res.cookie("MY_ACCESS_TOKEN", accessToken, { httpOnly: true, maxAge: 10 * 1000, secure: true, sameSite: "strict" });
-        console.log("refreshed");
+    if (verifyToken == "match") {
+        const accessToken = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
+        res.cookie("MY_ACCESS_TOKEN", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000, secure: true, sameSite: "strict" });
         res.redirect("/dashboard");
     } else {
+        res.clearCookie("MY_REFRESH_TOKEN", { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: true, sameSite: "strict", path: ["/logout", "/refresh"] });
         res.redirect("/login");
     }
 }
 
-module.exports = { index, signup, createUser, loginUser, dashboard, authenticateToken, refreshToken };
+async function logout(req, res) {
+    const refreshToken = cookie.parse(req.headers.cookie).MY_REFRESH_TOKEN;
+    const accessToken = cookie.parse(req.headers.cookie).MY_ACCESS_TOKEN;
+    let email;
+
+    if (refreshToken) {
+        email = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+            if (err) {
+                return undefined;
+            }
+            return user.email;
+        });
+    }
+
+    if (!email && accessToken) {
+        email = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+            if (err) {
+                return undefined;
+            }
+            return user.email;
+        });
+    }
+
+    if (email) {
+        await model.logout(email);
+    }
+
+    res.cookie("MY_ACCESS_TOKEN", " ", { httpOnly: true, maxAge: 1000, secure: true, sameSite: "strict" });
+    res.cookie("MY_REFRESH_TOKEN", " ", { httpOnly: true, maxAge: 1000, secure: true, sameSite: "strict" });
+    res.render("logout");
+}
+
+module.exports = { index, login, signup, createUser, loginUser, dashboard, authenticateToken, refreshToken, logout };
