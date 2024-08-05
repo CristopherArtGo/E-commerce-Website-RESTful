@@ -41,10 +41,6 @@ async function loginUser(req, res) {
     }
 }
 
-function dashboard(req, res) {
-    res.send(req.user);
-}
-
 function authenticateToken(req, res, next) {
     const accessToken = cookie.parse(req.headers.cookie).MY_ACCESS_TOKEN;
     if (!accessToken) {
@@ -63,7 +59,6 @@ function authenticateToken(req, res, next) {
 
 async function refreshToken(req, res) {
     const refreshToken = cookie.parse(req.headers.cookie).MY_REFRESH_TOKEN;
-    console.log(refreshToken);
 
     if (!refreshToken) {
         res.redirect("/login");
@@ -124,4 +119,4 @@ async function logout(req, res) {
     res.render("logout");
 }
 
-module.exports = { index, login, signup, createUser, loginUser, dashboard, authenticateToken, refreshToken, logout };
+module.exports = { index, login, signup, createUser, loginUser, authenticateToken, refreshToken, logout };
