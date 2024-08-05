@@ -1,4 +1,4 @@
-const model = require("../models/UserModel");
+const userModel = require("../models/UserModel");
 const jwt = require("jsonwebtoken");
 const cookie = require("cookie");
 require("dotenv").config();
@@ -16,12 +16,12 @@ function signup(req, res) {
 }
 
 async function createUser(req, res) {
-    let result = await model.createUser(req.body);
+    let result = await userModel.createUser(req.body);
     res.json(result);
 }
 
 async function loginUser(req, res) {
-    let result = await model.loginUser(req.body);
+    let result = await userModel.loginUser(req.body);
 
     if (result.error) {
         res.json(result);
@@ -30,7 +30,7 @@ async function loginUser(req, res) {
         const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
         const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "1d" });
 
-        let saveToken = await model.saveToken(user.email, refreshToken);
+        let saveToken = await userModel.saveToken(user.email, refreshToken);
         if (saveToken == "Token Created") {
             res.cookie("MY_ACCESS_TOKEN", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000, secure: true, sameSite: "strict" });
             res.cookie("MY_REFRESH_TOKEN", refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: true, sameSite: "strict", path: ["/logout", "/refresh"] });
@@ -75,7 +75,7 @@ async function refreshToken(req, res) {
         res.redirect("/login");
     }
 
-    const verifyToken = await model.verifyToken(email, refreshToken);
+    const verifyToken = await userModel.verifyToken(email, refreshToken);
 
     if (verifyToken == "match") {
         const accessToken = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
@@ -111,7 +111,7 @@ async function logout(req, res) {
     }
 
     if (email) {
-        await model.logout(email);
+        await userModel.logout(email);
     }
 
     res.cookie("MY_ACCESS_TOKEN", " ", { httpOnly: true, maxAge: 1000, secure: true, sameSite: "strict" });

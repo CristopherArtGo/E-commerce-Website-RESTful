@@ -1,4 +1,4 @@
-const model = require("../models/ProductModel");
+const productModel = require("../models/ProductModel");
 const userModel = require("../models/UserModel");
 
 async function dashboard(req, res) {
@@ -8,7 +8,7 @@ async function dashboard(req, res) {
 }
 
 async function getAllProducts(req, res) {
-    const products = await model.getAllProducts();
+    const products = await productModel.getAllProducts();
     res.json(products);
 }
 
@@ -19,7 +19,7 @@ async function productPage(req, res) {
 }
 
 async function productInfo(req, res) {
-    const product = await model.getProductInfo(parseInt(req.params.id));
+    const product = await productModel.getProductInfo(parseInt(req.params.id));
     res.json(product);
 }
 
