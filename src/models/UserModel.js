@@ -180,4 +180,16 @@ async function logout(email) {
     });
 }
 
-module.exports = { getAllUsers, createUser, loginUser, saveToken, verifyToken, logout };
+async function getUser(email) {
+    return new Promise((resolve, reject) => {
+        let sql = "SELECT * FROM users WHERE email = ?";
+        db.get(sql, [email], (err, row) => {
+            if (err) {
+                reject(err);
+            }
+            resolve(row);
+        });
+    });
+}
+
+module.exports = { getAllUsers, createUser, loginUser, saveToken, verifyToken, logout, getUser };

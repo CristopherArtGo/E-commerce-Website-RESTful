@@ -80,7 +80,7 @@ async function refreshToken(req, res) {
     if (verifyToken == "match") {
         const accessToken = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
         res.cookie("MY_ACCESS_TOKEN", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000, secure: true, sameSite: "strict" });
-        res.redirect("/dashboard");
+        res.redirect("/products");
     } else {
         res.clearCookie("MY_REFRESH_TOKEN", { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: true, sameSite: "strict", path: ["/logout", "/refresh"] });
         res.redirect("/login");
