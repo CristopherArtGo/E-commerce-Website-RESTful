@@ -3,13 +3,13 @@
 # Tools and Technologies
 
 -   Bootstrap
--   NodeJS
--   ExpressJS
--   SQLite
+-   Node.js
+-   Express.js
+-   SQLite3
 
 # Features
 
-1. Users can signup and login and log out into the application 
+1. Users can signup and login and logout into the application 
 2. Used JWT as authorization and hashed and salted users' password including refresh tokens in the database
 3. Users can view all products
 4. Users can view more details of a product with a product page
@@ -36,6 +36,6 @@
 4. For normal user, you can use the following credentials:
 
 ```
-    email: john@doe.com
+    email: john.doe@example.com
     password: 12345678
 ```
