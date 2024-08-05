@@ -23,6 +23,7 @@
 2. In the terminal, start the node server by running the following:
 
 ```
+    npm i
     npm run dev
 ```
 
