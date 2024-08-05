@@ -12,7 +12,7 @@ const formatter = new Intl.NumberFormat("en-US", {
         name = name.charAt(0).toUpperCase() + name.slice(1);
         category_name = category_name.charAt(0).toUpperCase() + category_name.slice(1);
         let row = document.createElement("tr");
-        row.innerHTML = `<td>${id}</td><td><a href="/products/${id}">${name}</a></td><td>${category_name}</td><td>${formatter.format(price)}</td><td>${description}</td><td><a href="#">Edit</a> <a href="#" class="text-danger">Delete</a></td>`;
+        row.innerHTML = `<td>${id}</td><td><a href="/products/${id}">${name}</a></td><td>${category_name}</td><td>${formatter.format(price)}</td><td>${description}</td><td><a href="/products/edit/${id}">Edit</a> <a href="/products/delete/${id}" class="text-danger">Delete</a></td>`;
         tableBody.appendChild(row);
     });
 })();
