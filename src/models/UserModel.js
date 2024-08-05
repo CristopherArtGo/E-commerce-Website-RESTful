@@ -1,13 +1,5 @@
-const sqlite3 = require("sqlite3");
 const bcrypt = require("bcrypt");
-
-let db = new sqlite3.Database("database.db", (err) => {
-    if (err) {
-        console.log("Error Occurred - " + err.message);
-    } else {
-        console.log("Database Connected");
-    }
-});
+const db = require("../db");
 
 function getAllUsers() {
     return new Promise((resolve, reject) => {
