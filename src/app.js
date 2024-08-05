@@ -13,5 +13,5 @@ app.use("/", router);
 
 app.listen(PORT, () => {
     console.log(`Listening to port ${PORT}`);
-    console.log("http://localhost:8000/login");
+    console.log("Start here => http://localhost:8000/login");
 });

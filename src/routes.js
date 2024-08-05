@@ -12,6 +12,7 @@ Router.post("/users", UsersController.createUser);
 Router.post("/login", UsersController.loginUser);
 Router.get("/refresh", UsersController.refreshToken);
 Router.get("/logout", UsersController.logout);
+Router.get("/profile", UsersController.authenticateToken, AdminsController.checkRole, UsersController.profile);
 
 Router.get("/admin", UsersController.authenticateToken, AdminsController.checkRole, AdminsController.filterUser, AdminsController.adminDashboard);
 Router.get("/products/new", UsersController.authenticateToken, AdminsController.checkRole, AdminsController.filterUser, AdminsController.newProduct);
@@ -21,6 +22,7 @@ Router.get("/products/delete/:id", UsersController.authenticateToken, AdminsCont
 Router.get("/products", UsersController.authenticateToken, AdminsController.checkRole, ProductsController.dashboard);
 Router.get("/products/:id", UsersController.authenticateToken, AdminsController.checkRole, ProductsController.productPage);
 
+Router.get("/api/users/:id", UsersController.getUser);
 Router.get("/api/products", ProductsController.getAllProducts);
 Router.get("/api/products/:id", ProductsController.productInfo);
 Router.post("/api/products", UsersController.authenticateToken, AdminsController.checkRole, AdminsController.filterUser, ProductsController.addProduct);
