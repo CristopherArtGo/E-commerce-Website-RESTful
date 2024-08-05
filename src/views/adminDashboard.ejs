@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Admin Page</title>
+        <link rel="stylesheet" href="css/bootstrap/bootstrap.css" />
+        <script defer src="js/bootstrap/bootstrap.js"></script>
+        <script defer src="js/adminDashboard.js"></script>
+    </head>
+    <body class="min-h-100 py-3">
+        <div class="container">
+            <div class="row">
+                <h1 class="col"><a class="text-decoration-none" href="/">AMAZUN</a></h1>
+                <div class="col row">
+                    <p class="text-end col">Welcome <span class="fw-bold"><%= first_name %>!</span></p>
+                    <div class="col">
+                        <a class="text-danger text-end" href="/logout">Logout</a>
+                    </div>
+                </div>
+            </div>
+            <h4>Admin Dashboard</h4>
+            <div class="products">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Product ID</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Price</th>
+                            <th scope="col" colspan="">Description</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </body>
+</html>
