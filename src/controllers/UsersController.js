@@ -119,4 +119,16 @@ async function logout(req, res) {
     res.render("logout");
 }
 
-module.exports = { index, login, signup, createUser, loginUser, authenticateToken, refreshToken, logout };
+async function profile(req, res) {
+    let user = await userModel.getUser(req.user.email);
+    user.first_name = user.first_name.charAt(0).toUpperCase() + user.first_name.slice(1);
+    res.render("profile", { first_name: user.first_name, id: user.id, role: user.role });
+}
+
+async function getUser(req, res) {
+    let user = await userModel.getUserbyId(req.params.id);
+    user.password = "";
+    res.json(user);
+}
+
+module.exports = { index, login, signup, createUser, loginUser, authenticateToken, refreshToken, logout, profile, getUser };

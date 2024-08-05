@@ -192,4 +192,16 @@ async function getUser(email) {
     });
 }
 
-module.exports = { getAllUsers, createUser, loginUser, saveToken, verifyToken, logout, getUser };
+async function getUserbyId(id) {
+    return new Promise((resolve, reject) => {
+        let sql = "SELECT * FROM users WHERE id = ?";
+        db.get(sql, [id], (err, row) => {
+            if (err) {
+                reject(err);
+            }
+            resolve(row);
+        });
+    });
+}
+
+module.exports = { getAllUsers, createUser, loginUser, saveToken, verifyToken, logout, getUser, getUserbyId };
