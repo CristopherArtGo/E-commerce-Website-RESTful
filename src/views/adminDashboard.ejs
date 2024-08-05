@@ -10,16 +10,11 @@
     </head>
     <body class="min-h-100 py-3">
         <div class="container">
+            <%- include('partials/adminHeader') %>
             <div class="row">
-                <h1 class="col"><a class="text-decoration-none" href="/">AMAZUN</a></h1>
-                <div class="col row">
-                    <p class="text-end col">Welcome <span class="fw-bold"><%= first_name %>!</span></p>
-                    <div class="col">
-                        <a class="text-danger text-end" href="/logout">Logout</a>
-                    </div>
-                </div>
+                <h4 class="col">Admin Dashboard</h4>
+                <h4 class="col text-end"><a href="/products/new"> + Add Product</a></h4>
             </div>
-            <h4>Admin Dashboard</h4>
             <div class="products">
                 <table class="table table-striped">
                     <thead>

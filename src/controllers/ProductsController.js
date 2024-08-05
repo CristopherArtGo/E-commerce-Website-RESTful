@@ -13,9 +13,18 @@ async function getAllProducts(req, res) {
 }
 
 async function productPage(req, res) {
-    let user = await userModel.getUser(req.user.email);
-    user.first_name = user.first_name.charAt(0).toUpperCase() + user.first_name.slice(1);
-    res.render("productPage", { first_name: user.first_name, role: req.user.role });
+    const url = req.url;
+    const index = url.lastIndexOf("/");
+    const product_id = url.slice(index + 1);
+    const product = await productModel.getProductInfo(product_id);
+
+    if (product[0].id) {
+        let user = await userModel.getUser(req.user.email);
+        user.first_name = user.first_name.charAt(0).toUpperCase() + user.first_name.slice(1);
+        res.render("productPage", { first_name: user.first_name, role: req.user.role });
+    } else {
+        redirect("/products");
+    }
 }
 
 async function productInfo(req, res) {
@@ -23,4 +32,24 @@ async function productInfo(req, res) {
     res.json(product);
 }
 
-module.exports = { dashboard, getAllProducts, productInfo, productPage };
+async function getAllCategories(req, res) {
+    const categories = await productModel.getAllCategories();
+    res.json(categories);
+}
+
+async function addProduct(req, res) {
+    let result = await productModel.createProduct(req.body);
+    res.json(result);
+}
+
+async function updateProduct(req, res) {
+    let result = await productModel.updateProduct(req.body);
+    res.json(result);
+}
+
+async function deleteProduct(req, res) {
+    let result = await productModel.deleteProduct(req.body);
+    res.json(result);
+}
+
+module.exports = { dashboard, getAllProducts, productInfo, productPage, getAllCategories, addProduct, updateProduct, deleteProduct };
