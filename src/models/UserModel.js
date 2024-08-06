@@ -132,7 +132,7 @@ async function saveToken(user, token) {
             });
         };
 
-        if (userExists) {
+        if (userExists == "exists") {
             let sql = "UPDATE tokens SET token = ? WHERE email = ?";
             db.run(sql, [tokenHash, user], (err) => {
                 if (err) {
