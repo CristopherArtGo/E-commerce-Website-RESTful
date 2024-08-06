@@ -122,8 +122,8 @@ async function logout(req, res) {
         await userModel.logout(email);
     }
 
-    res.cookie("MY_ACCESS_TOKEN", " ", { httpOnly: true, maxAge: 1000, secure: true, sameSite: "strict" });
-    res.cookie("MY_REFRESH_TOKEN", " ", { httpOnly: true, maxAge: 1000, secure: true, sameSite: "strict" });
+    res.cookie("MY_ACCESS_TOKEN", "", { httpOnly: true, maxAge: 1000, secure: true, sameSite: "strict" });
+    res.cookie("MY_REFRESH_TOKEN", "", { httpOnly: true, maxAge: 1000, secure: true, sameSite: "strict" });
     res.render("logout");
 }
 
