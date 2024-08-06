@@ -140,14 +140,15 @@ async function saveToken(user, token) {
                 }
                 resolve("Token Created");
             });
+        } else {
+            let sql = "INSERT INTO tokens(email, token) VALUES(?, ?)";
+            db.run(sql, [user, tokenHash], (err) => {
+                if (err) {
+                    reject(err);
+                }
+                resolve("Token Created");
+            });
         }
-        let sql = "INSERT INTO tokens(email, token) VALUES(?, ?)";
-        db.run(sql, [user, tokenHash], (err) => {
-            if (err) {
-                reject(err);
-            }
-            resolve("Token Created");
-        });
     });
 }
 
