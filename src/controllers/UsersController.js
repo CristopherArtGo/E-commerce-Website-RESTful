@@ -42,6 +42,10 @@ async function loginUser(req, res) {
 }
 
 function authenticateToken(req, res, next) {
+    if (!req.headers || !req.headers.cookie) {
+        return res.redirect("/refresh");
+    }
+
     const accessToken = cookie.parse(req.headers.cookie).MY_ACCESS_TOKEN;
     if (!accessToken) {
         return res.redirect("/refresh");
@@ -58,6 +62,10 @@ function authenticateToken(req, res, next) {
 }
 
 async function refreshToken(req, res) {
+    if (!req.headers || !req.headers.cookie) {
+        return res.redirect("/login");
+    }
+
     const refreshToken = cookie.parse(req.headers.cookie).MY_REFRESH_TOKEN;
 
     if (!refreshToken) {

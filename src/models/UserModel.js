@@ -80,7 +80,7 @@ function validateSignup(userInput) {
         inputErrors.push("Password cannot be blank");
     }
 
-    if (password.length < 8) {
+    if (password && password.length < 8) {
         inputErrors.push("Password must be at least 8 characters");
     }
 
