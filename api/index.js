@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const path = require("path");
-const PORT = 8000;
+const PORT = 3000;
 const router = require("./routes");
 
 app.use(express.static(path.join(__dirname, "/assets")));
@@ -13,5 +13,6 @@ app.use("/", router);
 
 app.listen(PORT, () => {
     console.log(`Listening to port ${PORT}`);
-    console.log("Start here => http://localhost:8000/login");
 });
+
+module.exports = app;
