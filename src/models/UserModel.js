@@ -115,40 +115,40 @@ async function saveToken(user, token) {
     return new Promise((resolve, reject) => {
         let tokenHash = bcrypt.hashSync(token, 10);
 
-        let userExists = async () => {
-            return new Promise((resolve, reject) => {
-                let sql = "SELECT * FROM tokens WHERE email = ?";
-                db.get(sql, [user], (err, row) => {
-                    if (err) {
-                        reject(err);
-                    }
+        // let userExists = async () => {
+        //     return new Promise((resolve, reject) => {
+        //         let sql = "SELECT * FROM tokens WHERE email = ?";
+        //         db.get(sql, [user], (err, row) => {
+        //             if (err) {
+        //                 reject(err);
+        //             }
 
-                    if (row) {
-                        resolve("exists");
-                    }
+        //             if (row) {
+        //                 resolve("exists");
+        //             }
 
-                    resolve(false);
-                });
-            });
-        };
+        //             resolve(false);
+        //         });
+        //     });
+        // };
 
-        if (userExists == "exists") {
-            let sql = "UPDATE tokens SET token = ? WHERE email = ?";
-            db.run(sql, [tokenHash, user], (err) => {
-                if (err) {
-                    reject(err);
-                }
-                resolve("Token Created");
-            });
-        } else {
-            let sql = "INSERT INTO tokens(email, token) VALUES(?, ?)";
-            db.run(sql, [user, tokenHash], (err) => {
-                if (err) {
-                    reject(err);
-                }
-                resolve("Token Created");
-            });
-        }
+        // if (userExists == "exists") {
+        //     let sql = "UPDATE tokens SET token = ? WHERE email = ?";
+        //     db.run(sql, [tokenHash, user], (err) => {
+        //         if (err) {
+        //             reject(err);
+        //         }
+        //         resolve("Token Created");
+        //     });
+        // } else {
+        let sql = "INSERT OR REPLACE INTO tokens(email, token) VALUES(?, ?)";
+        db.run(sql, [user, tokenHash], (err) => {
+            if (err) {
+                reject(err);
+            }
+            resolve("Token Created");
+        });
+        // }
     });
 }
 
