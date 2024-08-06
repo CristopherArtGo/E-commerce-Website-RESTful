@@ -96,35 +96,39 @@ async function refreshToken(req, res) {
 }
 
 async function logout(req, res) {
-    const refreshToken = cookie.parse(req.headers.cookie).MY_REFRESH_TOKEN;
-    const accessToken = cookie.parse(req.headers.cookie).MY_ACCESS_TOKEN;
-    let email;
+    if (!req.headers || !req.headers.cookie) {
+        res.redirect("/login");
+    } else {
+        const refreshToken = cookie.parse(req.headers.cookie).MY_REFRESH_TOKEN;
+        const accessToken = cookie.parse(req.headers.cookie).MY_ACCESS_TOKEN;
+        let email;
 
-    if (refreshToken) {
-        email = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-            if (err) {
-                return undefined;
-            }
-            return user.email;
-        });
+        if (refreshToken) {
+            email = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+                if (err) {
+                    return undefined;
+                }
+                return user.email;
+            });
+        }
+
+        if (!email && accessToken) {
+            email = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+                if (err) {
+                    return undefined;
+                }
+                return user.email;
+            });
+        }
+
+        if (email) {
+            await userModel.logout(email);
+        }
+
+        res.cookie("MY_ACCESS_TOKEN", "", { httpOnly: true, maxAge: 1000, secure: true, sameSite: "strict" });
+        res.cookie("MY_REFRESH_TOKEN", "", { httpOnly: true, maxAge: 1000, secure: true, sameSite: "strict" });
+        res.render("logout");
     }
-
-    if (!email && accessToken) {
-        email = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-            if (err) {
-                return undefined;
-            }
-            return user.email;
-        });
-    }
-
-    if (email) {
-        await userModel.logout(email);
-    }
-
-    res.cookie("MY_ACCESS_TOKEN", "", { httpOnly: true, maxAge: 1000, secure: true, sameSite: "strict" });
-    res.cookie("MY_REFRESH_TOKEN", "", { httpOnly: true, maxAge: 1000, secure: true, sameSite: "strict" });
-    res.render("logout");
 }
 
 async function profile(req, res) {

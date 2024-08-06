@@ -24,7 +24,7 @@
     if (is_admin) {
         role.textContent = `Role: Admin`;
     } else {
-        role.textContent = `Role: USer`;
+        role.textContent = `Role: User`;
     }
     container.appendChild(role);
 
