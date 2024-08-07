@@ -11,7 +11,7 @@ function index(req, res) {
 function login(req, res) {
     const accessToken = req.headers.cookie ? cookie.parse(req.headers.cookie).MY_ACCESS_TOKEN : undefined;
     const refreshToken = req.headers.cookie ? cookie.parse(req.headers.cookie).MY_REFRESH_TOKEN : undefined;
-    !accessToken && !refreshToken ? res.redirect("/refresh") : res.render("login");
+    !accessToken && !refreshToken ? res.render("login") : res.redirect("/refresh");
 }
 
 function signup(req, res) {
