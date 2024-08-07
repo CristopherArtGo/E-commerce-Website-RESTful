@@ -4,7 +4,8 @@ const cookie = require("cookie");
 require("dotenv").config();
 
 function index(req, res) {
-    res.redirect("/products");
+    const accessToken = req.headers.cookie ? cookie.parse(req.headers.cookie).MY_ACCESS_TOKEN : undefined;
+    accessToken ? res.redirect("/products") : res.redirect("/refresh");
 }
 
 function login(req, res) {

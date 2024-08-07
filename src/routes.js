@@ -5,7 +5,7 @@ const UsersController = require("./controllers/UsersController");
 const ProductsController = require("./controllers/ProductsController");
 const AdminsController = require("./controllers/AdminsController");
 
-Router.get("/", UsersController.authenticateToken, UsersController.index);
+Router.get("/", UsersController.index);
 Router.get("/login", UsersController.login);
 Router.get("/signup", UsersController.signup);
 Router.post("/users", UsersController.createUser);
