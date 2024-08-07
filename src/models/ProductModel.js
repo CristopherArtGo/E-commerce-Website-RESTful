@@ -137,4 +137,20 @@ function deleteProduct(product) {
     });
 }
 
-module.exports = { getAllProducts, getProductInfo, getAllCategories, createProduct, updateProduct, deleteProduct };
+function searchProduct(search) {
+    return new Promise(async (resolve, reject) => {
+        const query = {
+            text: "SELECT products.*, categories.category_name FROM products INNER JOIN categories ON products.category_id = categories.id WHERE UPPER(products.name) LIKE UPPER($1) OR UPPER(categories.category_name) LIKE UPPER($2)",
+            values: ["%" + search + "%", "%" + search + "%"],
+        };
+
+        try {
+            const { rows } = await db.query(query);
+            resolve(rows);
+        } catch (err) {
+            reject(err);
+        }
+    });
+}
+
+module.exports = { getAllProducts, getProductInfo, getAllCategories, createProduct, updateProduct, deleteProduct, searchProduct };
