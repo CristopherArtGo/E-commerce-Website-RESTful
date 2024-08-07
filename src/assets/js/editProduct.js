@@ -21,7 +21,7 @@ const product_id = url.slice(index + 1);
 (async () => {
     const rawResponse = await fetch(`/api/products/${product_id}`);
     const result = await rawResponse.json();
-    let { id, name, description, price, category_name } = result[0];
+    let { id, name, description, price, category_name } = result;
 
     document.querySelector("h4").textContent = document.querySelector("h4").textContent + id;
 

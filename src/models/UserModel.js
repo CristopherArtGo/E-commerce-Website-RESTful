@@ -2,45 +2,45 @@ const bcrypt = require("bcrypt");
 const db = require("../db");
 
 function getAllUsers() {
-    return new Promise((resolve, reject) => {
-        let sql = "SELECT * FROM users";
-        db.all(sql, [], (err, rows) => {
-            if (err) {
-                reject(err);
-            }
+    return new Promise(async (resolve, reject) => {
+        const query = {
+            text: "SELECT * FROM users",
+            values: [],
+        };
+
+        try {
+            const { rows } = await db.query(query);
             resolve(rows);
-        });
+        } catch (err) {
+            reject(err);
+        }
     });
 }
 
 async function createUser(user) {
     try {
-        let inputErrors = validateSignup(user);
+        const inputErrors = validateSignup(user);
 
         if (inputErrors) {
             throw { error: inputErrors };
         }
 
-        let { first_name, last_name, email, password } = user;
-
-        let currentTime = new Date().toISOString();
-        let passwordHash = bcrypt.hashSync(password, 10);
-        let sql = "INSERT INTO users(first_name, last_name, email, password, created_at, updated_at) VALUES(?, ?, ?, ?, ?, ?)";
-
-        let existingUser = await findUser(email);
+        const { first_name, last_name, email, password } = user;
+        const currentTime = new Date().toISOString();
+        const passwordHash = bcrypt.hashSync(password, 10);
+        const existingUser = await getUserByEmail(email);
 
         if (existingUser) {
             throw { error: ["Email already taken!"] };
         }
 
-        return new Promise((resolve, reject) => {
-            db.run(sql, [first_name, last_name, email, passwordHash, currentTime, currentTime], (err) => {
-                if (err) {
-                    reject(err.message);
-                }
-                resolve({ success: "User created successfully" });
-            });
-        });
+        const query = {
+            text: "INSERT INTO users(first_name, last_name, email, password, created_at, updated_at) VALUES($1, $2, $3, $4, $5, $6)",
+            values: [first_name, last_name, email, passwordHash, currentTime, currentTime],
+        };
+
+        await db.query(query);
+        return { success: "User created successfully" };
     } catch (error) {
         return error;
     }
@@ -51,7 +51,7 @@ async function loginUser(user) {
         return { error: ["Email and Password must not be blank"] };
     }
 
-    let existingUser = await findUser(user.email);
+    const existingUser = await getUserByEmail(user.email);
 
     if (existingUser && bcrypt.compareSync(user.password, existingUser.password)) {
         return existingUser;
@@ -61,9 +61,9 @@ async function loginUser(user) {
 }
 
 function validateSignup(userInput) {
-    let { first_name, last_name, email, password, confirm_password } = userInput;
-
+    const { first_name, last_name, email, password, confirm_password } = userInput;
     let inputErrors = [];
+
     if (!first_name) {
         inputErrors.push("First Name cannot be blank");
     }
@@ -95,114 +95,91 @@ function validateSignup(userInput) {
     return false;
 }
 
-function findUser(email) {
-    return new Promise((resolve, reject) => {
-        let sql = "SELECT * FROM users WHERE email = ?";
-        db.all(sql, [email], (err, row) => {
-            if (err) {
-                reject(err.message);
-            }
-            if (row) {
-                resolve(row[0]);
-            }
+function getUserByEmail(email) {
+    return new Promise(async (resolve, reject) => {
+        const query = {
+            text: "SELECT * FROM users WHERE email = $1",
+            values: [email],
+        };
 
-            resolve(undefined);
-        });
+        try {
+            const { rows } = await db.query(query);
+            resolve(rows[0]);
+        } catch (err) {
+            reject(err.message);
+        }
     });
 }
 
-async function saveToken(user, token) {
-    return new Promise((resolve, reject) => {
-        let tokenHash = bcrypt.hashSync(token, 10);
+function saveToken(email, token) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const tokenHash = bcrypt.hashSync(token, 10);
 
-        // let userExists = async () => {
-        //     return new Promise((resolve, reject) => {
-        //         let sql = "SELECT * FROM tokens WHERE email = ?";
-        //         db.get(sql, [user], (err, row) => {
-        //             if (err) {
-        //                 reject(err);
-        //             }
+            const query = {
+                text: "INSERT INTO tokens(email, token) VALUES($1, $2) ON CONFLICT (email) DO UPDATE SET token = $2",
+                values: [email, tokenHash],
+            };
 
-        //             if (row) {
-        //                 resolve("exists");
-        //             }
-
-        //             resolve(false);
-        //         });
-        //     });
-        // };
-
-        // if (userExists == "exists") {
-        //     let sql = "UPDATE tokens SET token = ? WHERE email = ?";
-        //     db.run(sql, [tokenHash, user], (err) => {
-        //         if (err) {
-        //             reject(err);
-        //         }
-        //         resolve("Token Created");
-        //     });
-        // } else {
-        let sql = "INSERT OR REPLACE INTO tokens(email, token) VALUES(?, ?)";
-        db.run(sql, [user, tokenHash], (err) => {
-            if (err) {
-                reject(err);
-            }
+            await db.query(query);
             resolve("Token Created");
-        });
-        // }
+        } catch (err) {
+            reject(err);
+        }
     });
 }
 
-async function verifyToken(email, token) {
-    return new Promise((resolve, reject) => {
-        let sql = "SELECT * FROM tokens WHERE email = ?";
-        db.get(sql, [email], (err, row) => {
-            if (err) {
-                reject(err);
-            }
+function verifyToken(email, token) {
+    return new Promise(async (resolve, reject) => {
+        const query = {
+            text: "SELECT * FROM tokens WHERE email = $1",
+            values: [email],
+        };
 
-            if (row && bcrypt.compareSync(token, row.token)) {
+        try {
+            const { rows } = await db.query(query);
+
+            if (rows[0] && bcrypt.compareSync(token, rows[0].token)) {
                 resolve("match");
-            }
+            }   
 
             resolve(false);
-        });
+        } catch (err) {
+            reject(err);
+        }
     });
 }
 
-async function logout(email) {
-    return new Promise((resolve, reject) => {
-        let sql = "DELETE FROM tokens WHERE email = ?";
-        db.run(sql, [email], (err, row) => {
-            if (err) {
-                reject(err);
-            }
-            resolve();
-        });
+function logout(email) {
+    return new Promise(async (resolve, reject) => {
+        const query = {
+            text: "DELETE FROM tokens WHERE email = $1",
+            values: [email],
+        };
+
+        try {
+            await db.query(query);
+        } catch (err) {
+            reject(err);
+        }
+        resolve();
     });
 }
 
-async function getUser(email) {
-    return new Promise((resolve, reject) => {
-        let sql = "SELECT * FROM users WHERE email = ?";
-        db.get(sql, [email], (err, row) => {
-            if (err) {
-                reject(err);
-            }
-            resolve(row);
-        });
+function getUserById(id) {
+    return new Promise(async (resolve, reject) => {
+        const query = {
+            text: "SELECT * FROM users WHERE id = $1",
+            values: [id],
+        };
+
+        try {
+            const { rows } = await db.query(query);
+            resolve(rows[0]);
+        } catch (err) {
+            reject(err);
+        }
     });
 }
 
-async function getUserbyId(id) {
-    return new Promise((resolve, reject) => {
-        let sql = "SELECT * FROM users WHERE id = ?";
-        db.get(sql, [id], (err, row) => {
-            if (err) {
-                reject(err);
-            }
-            resolve(row);
-        });
-    });
-}
-
-module.exports = { getAllUsers, createUser, loginUser, saveToken, verifyToken, logout, getUser, getUserbyId };
+module.exports = { getAllUsers, createUser, loginUser, saveToken, verifyToken, logout, getUserByEmail, getUserById };

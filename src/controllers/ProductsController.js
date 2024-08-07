@@ -2,7 +2,7 @@ const productModel = require("../models/ProductModel");
 const userModel = require("../models/UserModel");
 
 async function dashboard(req, res) {
-    let user = await userModel.getUser(req.user.email);
+    let user = await userModel.getUserByEmail(req.user.email);
     user.first_name = user.first_name.charAt(0).toUpperCase() + user.first_name.slice(1);
     res.render("products", { first_name: user.first_name, role: req.user.role });
 }
@@ -18,8 +18,8 @@ async function productPage(req, res) {
     const product_id = url.slice(index + 1);
     const product = await productModel.getProductInfo(product_id);
 
-    if (product[0].id) {
-        let user = await userModel.getUser(req.user.email);
+    if (product.id) {
+        let user = await userModel.getUserByEmail(req.user.email);
         user.first_name = user.first_name.charAt(0).toUpperCase() + user.first_name.slice(1);
         res.render("productPage", { first_name: user.first_name, role: req.user.role });
     } else {
