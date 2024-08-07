@@ -5,7 +5,7 @@
 -   Bootstrap
 -   Node.js
 -   Express.js
--   SQLite3
+-   PostgreSQL
 
 # Features
 
@@ -24,10 +24,10 @@
 
 ```
     npm i
-    npm run dev
+    npm run start
 ```
 
-3. On a browser, open `http://localhost:8000/login`
+3. On a browser, open `http://localhost:3000/login`
 4. For admin user, you can use the following credentials:
 
 ```

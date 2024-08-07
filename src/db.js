@@ -1,11 +1,19 @@
-const sqlite3 = require("sqlite3");
+const { Pool } = require("pg");
+require("dotenv").config();
 
-let db = new sqlite3.Database("database.db", (err) => {
+const db = new Pool({
+    connectionString: process.env.POSTGRES_URL,
+    user: process.env.POSTGRES_USER,
+    host: process.env.POSTGRES_HOST,
+    password: process.env.POSTGRES_PASSWORD,
+    port: 5452,
+});
+
+db.connect((err) => {
     if (err) {
-        console.log("Error Occurred - " + err.message);
-    } else {
-        console.log("Database Connected");
+        throw err;
     }
+    console.log("Database Connected");
 });
 
 module.exports = db;
