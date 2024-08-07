@@ -4,13 +4,12 @@ const cookie = require("cookie");
 require("dotenv").config();
 
 function index(req, res) {
-    const accessToken = req.headers.cookie ? cookie.parse(req.headers.cookie).MY_ACCESS_TOKEN : undefined;
-    accessToken ? res.redirect("/products") : res.redirect("/refresh");
+    res.redirect("/refresh");
 }
 
 function login(req, res) {
     const accessToken = req.headers.cookie ? cookie.parse(req.headers.cookie).MY_ACCESS_TOKEN : undefined;
-    accessToken == "loggedOut" ? res.render("login") : res.redirect("/products");
+    accessToken == "logIn" ? res.render("login") : res.redirect("/refresh");
 }
 
 function signup(req, res) {
@@ -119,7 +118,7 @@ async function logout(req, res) {
         await userModel.logout(email);
     }
 
-    res.cookie("MY_ACCESS_TOKEN", "loggedOut", { httpOnly: true, maxAge: 1000, secure: true, sameSite: "strict" });
+    res.cookie("MY_ACCESS_TOKEN", "logIn", { httpOnly: true, maxAge: 1000, secure: true, sameSite: "strict" });
     res.cookie("MY_REFRESH_TOKEN", "", { httpOnly: true, maxAge: 1000, secure: true, sameSite: "strict", path: ["/refresh", "/logout"] });
     res.render("logout");
 }
