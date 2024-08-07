@@ -4,12 +4,14 @@ const cookie = require("cookie");
 require("dotenv").config();
 
 function index(req, res) {
-    res.redirect("/products");
+    const accessToken = req.headers.cookie ? cookie.parse(req.headers.cookie).MY_ACCESS_TOKEN : undefined;
+    accessToken ? res.redirect("/products") : res.redirect("/refresh");
 }
 
 function login(req, res) {
     const accessToken = req.headers.cookie ? cookie.parse(req.headers.cookie).MY_ACCESS_TOKEN : undefined;
-    accessToken ? res.redirect("/refresh") : res.render("login");
+    const refreshToken = req.headers.cookie ? cookie.parse(req.headers.cookie).MY_REFRESH_TOKEN : undefined;
+    !accessToken && !refreshToken ? res.redirect("/refresh") : res.render("login");
 }
 
 function signup(req, res) {
