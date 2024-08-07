@@ -43,7 +43,7 @@ async function loginUser(req, res) {
 }
 
 function authenticateToken(req, res, next) {
-    const accessToken = req.headers ? cookie.parse(req.headers.cookie).MY_ACCESS_TOKEN : undefined;
+    const accessToken = req.headers.cookie ? cookie.parse(req.headers.cookie).MY_ACCESS_TOKEN : undefined;
     if (!accessToken) {
         return res.redirect("/refresh");
     }
@@ -59,41 +59,42 @@ function authenticateToken(req, res, next) {
 }
 
 async function refreshToken(req, res) {
-    const refreshToken = req.headers ? cookie.parse(req.headers.cookie).MY_REFRESH_TOKEN : undefined;
+    const refreshToken = req.headers.cookie ? cookie.parse(req.headers.cookie).MY_REFRESH_TOKEN : undefined;
 
     if (!refreshToken) {
-        res.redirect("/login");
-    }
-
-    const email = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-        if (err) {
-            return undefined;
-        }
-        return user.email;
-    });
-
-    if (!email) {
-        res.clearCookie("MY_ACCESS_TOKEN", { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: true, sameSite: "strict" });
-        res.clearCookie("MY_REFRESH_TOKEN", { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: true, sameSite: "strict", path: ["/refresh", "/logout"] });
+        res.cookie("MY_ACCESS_TOKEN", "logIn", { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: true, sameSite: "strict" });
         res.redirect("/login");
     } else {
-        const verifyToken = await userModel.verifyToken(email, refreshToken);
+        const email = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
+            if (err) {
+                return undefined;
+            }
+            return user.email;
+        });
 
-        if (verifyToken == "match") {
-            const accessToken = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
-            res.cookie("MY_ACCESS_TOKEN", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000, secure: true, sameSite: "strict" });
-            res.redirect("/products");
-        } else {
-            res.clearCookie("MY_ACCESS_TOKEN", { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: true, sameSite: "strict" });
+        if (!email) {
+            res.cookie("MY_ACCESS_TOKEN", "logIn", { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: true, sameSite: "strict" });
             res.clearCookie("MY_REFRESH_TOKEN", { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: true, sameSite: "strict", path: ["/refresh", "/logout"] });
             res.redirect("/login");
+        } else {
+            const verifyToken = await userModel.verifyToken(email, refreshToken);
+
+            if (verifyToken == "match") {
+                const accessToken = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
+                res.cookie("MY_ACCESS_TOKEN", accessToken, { httpOnly: true, maxAge: 15 * 60 * 1000, secure: true, sameSite: "strict" });
+                res.redirect("/products");
+            } else {
+                res.cookie("MY_ACCESS_TOKEN", "logIn", { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: true, sameSite: "strict" });
+                res.clearCookie("MY_REFRESH_TOKEN", { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: true, sameSite: "strict", path: ["/refresh", "/logout"] });
+                res.redirect("/login");
+            }
         }
     }
 }
 
 async function logout(req, res) {
-    const refreshToken = req.headers ? cookie.parse(req.headers.cookie).MY_REFRESH_TOKEN : undefined;
-    const accessToken = req.headers ? cookie.parse(req.headers.cookie).MY_ACCESS_TOKEN : undefined;
+    const refreshToken = req.headers.cookie ? cookie.parse(req.headers.cookie).MY_REFRESH_TOKEN : undefined;
+    const accessToken = req.headers.cookie ? cookie.parse(req.headers.cookie).MY_ACCESS_TOKEN : undefined;
 
     let email;
     if (refreshToken) {
@@ -119,7 +120,7 @@ async function logout(req, res) {
     }
 
     res.cookie("MY_ACCESS_TOKEN", "logIn", { httpOnly: true, maxAge: 1000, secure: true, sameSite: "strict" });
-    res.cookie("MY_REFRESH_TOKEN", "", { httpOnly: true, maxAge: 1000, secure: true, sameSite: "strict", path: ["/refresh", "/logout"] });
+    res.clearCookie("MY_REFRESH_TOKEN", "", { httpOnly: true, maxAge: 1000, secure: true, sameSite: "strict", path: ["/refresh", "/logout"] });
     res.render("logout");
 }
 
