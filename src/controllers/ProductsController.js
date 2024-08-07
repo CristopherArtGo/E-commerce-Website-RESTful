@@ -52,4 +52,12 @@ async function deleteProduct(req, res) {
     res.json(result);
 }
 
-module.exports = { dashboard, getAllProducts, productInfo, productPage, getAllCategories, addProduct, updateProduct, deleteProduct };
+async function searchProduct(req, res) {
+    const url = req.url;
+    const index = url.lastIndexOf("/");
+    const keyword = index != url.length ? url.slice(index + 1) : undefined;
+    let result = keyword ? await productModel.searchProduct(keyword) : await productModel.getAllProducts();
+    res.json(result);
+}
+
+module.exports = { dashboard, getAllProducts, productInfo, productPage, getAllCategories, addProduct, updateProduct, deleteProduct, searchProduct };

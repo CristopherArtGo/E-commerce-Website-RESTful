@@ -22,6 +22,7 @@ Router.get("/products/delete/:id", UsersController.authenticateToken, AdminsCont
 Router.get("/products", UsersController.authenticateToken, AdminsController.checkRole, ProductsController.dashboard);
 Router.get("/products/:id", UsersController.authenticateToken, AdminsController.checkRole, ProductsController.productPage);
 
+Router.get("/api/products/search/:keyword?", ProductsController.searchProduct);
 Router.get("/api/users/:id", UsersController.getUser);
 Router.get("/api/products", ProductsController.getAllProducts);
 Router.get("/api/products/:id", ProductsController.productInfo);
